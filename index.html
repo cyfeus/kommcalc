@@ -60,7 +60,7 @@
     .small{ font-size:13px; color:var(--muted); }
     .row{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
       gap:12px;
     }
     @media (max-width:650px){
@@ -264,7 +264,8 @@
       line-height:1.6;
     }
     .install-steps li{ margin-bottom:6px; }
-    .check-line{display:flex;align-items:center;gap:10px;margin-top:8px}
+    .check-line{display:flex;align-items:flex-start;gap:10px;margin-top:8px}
+    .check-line label{flex:1;line-height:1.3;word-break:break-word}
     .paid-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
     .paid-yes{background:rgba(34,197,94,.14);color:#86efac;border:1px solid rgba(34,197,94,.25)}
     .paid-no{background:rgba(148,163,184,.12);color:#cbd5e1;border:1px solid rgba(148,163,184,.2)}
@@ -280,7 +281,7 @@
 <body>
   <div class="wrap">
     <h1 class="title">Калькулятор коммунальных платежей</h1>
-    <p class="subtitle">Многоэкранная версия: главная — новая запись, а тарифы, статистика и история открываются как отдельные страницы через меню.</p>
+    <p class="subtitle">ver. 1.000000124</p>
     <nav class="top-menu">
       <a href="#entrySection" class="menu-btn active">Главная</a>
       <a href="#summarySection" class="menu-btn">Статистика</a>
@@ -342,7 +343,7 @@
         </div>
 
         <p class="hint">
-          Первая запись работает как стартовая точка: вводишь текущие показания, сумма будет 0,00 ₴. Дальше записи считаются от нее или от последней записи с галкой «оплачено».
+          Первая запись работает как стартовая точка. Дальше записи считаются от нее или от последней записи с галкой «оплачено».
         </p>
       </section>
 
@@ -419,14 +420,14 @@
     </div>
 
     <section class="card" style="margin-top:16px;">
-      <h2>Как сделать почти как приложение на iPhone</h2>
+      <h2>Как сделать приложением на iPhone</h2>
       <ol class="install-steps">
         <li>Открой файл или страницу в Safari.</li>
         <li>Нажми кнопку <strong>Поделиться</strong>.</li>
         <li>Выбери <strong>На экран «Домой»</strong>.</li>
         <li>Сохрани ярлык — и калькулятор будет открываться почти как отдельное приложение.</li>
       </ol>
-      <p class="hint">Для самого удобного варианта лучше открыть этот HTML через сайт или хостинг, например GitHub Pages. Но и просто как страница он уже работает.</p>
+      <p class="hint">Разработано 28.03.2026</p>
     </section>
   </div>
 
