@@ -268,15 +268,28 @@
     .paid-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
     .paid-yes{background:rgba(34,197,94,.14);color:#86efac;border:1px solid rgba(34,197,94,.25)}
     .paid-no{background:rgba(148,163,184,.12);color:#cbd5e1;border:1px solid rgba(148,163,184,.2)}
+    .top-menu{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+    .menu-btn{display:inline-block;text-decoration:none;color:var(--text);padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#0b1220;font-weight:700}
+    .menu-btn:hover{border-color:var(--accent2)}
+    .menu-btn.active{background:linear-gradient(180deg,#38bdf8,#0284c7);color:#041019;border:none}
+    .app-screen{display:none}
+    .app-screen.active{display:block}
+    section[id]{scroll-margin-top:18px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1 class="title">Калькулятор коммунальных платежей</h1>
-    <p class="subtitle">Версия 2 с последними правками: расчетный месяц, галка «оплачено», накопление от последней оплаченной записи и первая запись как стартовая база без начисления.</p>
+    <p class="subtitle">Многоэкранная версия: главная — новая запись, а тарифы, статистика и история открываются как отдельные страницы через меню.</p>
+    <nav class="top-menu">
+      <a href="#entrySection" class="menu-btn active">Главная</a>
+      <a href="#summarySection" class="menu-btn">Статистика</a>
+      <a href="#historySection" class="menu-btn">История</a>
+      <a href="#tariffsSection" class="menu-btn">Тарифы</a>
+    </nav>
 
     <div class="grid grid-2">
-      <section class="card">
+      <section class="card app-screen active" id="entrySection">
         <h2>Новая запись <span class="badge">автосохранение</span></h2>
         <div class="row">
           <div>
@@ -333,21 +346,10 @@
         </p>
       </section>
 
-      <section class="card">
-        <h2>Тарифы и услуги</h2>
-        <p class="small">Можно менять тарифы и добавлять новые услуги. Для каждой услуги доступно до 4 тарифных строк.</p>
-
-        <div class="services" id="servicesEditor"></div>
-
-        <div class="btns">
-          <button class="secondary" id="addMeteredBtn">Добавить услугу со счетчиком</button>
-          <button id="addFixedBtn">Добавить фиксированную услугу</button>
-          <button id="resetDefaultsBtn">Вернуть стартовые тарифы</button>
-        </div>
-      </section>
     </div>
 
-    <div class="grid grid-2" style="margin-top:16px;">
+    <div class="app-screen" id="summarySection" style="margin-top:16px;">
+      <div class="grid grid-2">
       <section class="card">
         <h2>Сводка по месяцам</h2>
         <div class="row">
@@ -370,9 +372,11 @@
         </div>
         <p class="hint">Столбики показывают общую сумму по каждому месяцу выбранного года. Учитываются только записи с галкой «оплачено».</p>
       </section>
+      </div>
     </div>
 
-    <section class="card" style="margin-top:16px;">
+    <div class="app-screen" id="historySection" style="margin-top:16px;">
+    <section class="card">
       <h2>История начислений</h2>
       <div class="table-wrap">
         <table>
@@ -398,6 +402,21 @@
       </div>
       <p class="hint">Историю можно вести сколько угодно. За 1 год — без проблем, за несколько лет — тоже.</p>
     </section>
+    </div>
+
+    <div class="app-screen" id="tariffsSection">
+    <section class="card">
+      <h2>Тарифы и услуги</h2>
+      <p class="small">Можно менять тарифы и добавлять новые услуги. Для каждой услуги доступно до 4 тарифных строк. Если открылась старая сохранённая версия, стартовые тарифы автоматически подтягиваются.</p>
+      <div class="services" id="servicesEditor"></div>
+
+      <div class="btns">
+        <button class="secondary" id="addMeteredBtn">Добавить услугу со счетчиком</button>
+        <button id="addFixedBtn">Добавить фиксированную услугу</button>
+        <button id="resetDefaultsBtn">Вернуть стартовые тарифы</button>
+      </div>
+    </section>
+    </div>
 
     <section class="card" style="margin-top:16px;">
       <h2>Как сделать почти как приложение на iPhone</h2>
@@ -1167,7 +1186,28 @@
       e.target.value = "";
     });
 
+
+    function setActiveMenuLink() {
+      const hash = window.location.hash || "#entrySection";
+      document.querySelectorAll(".menu-btn").forEach(a => {
+        a.classList.toggle("active", a.getAttribute("href") === hash);
+      });
+      document.querySelectorAll(".app-screen").forEach(s => {
+        s.classList.toggle("active", "#" + s.id === hash);
+      });
+    }
+
+    document.querySelectorAll(".menu-btn").forEach(a => {
+      a.addEventListener("click", () => {
+        setTimeout(setActiveMenuLink, 0);
+      });
+    });
+
+    window.addEventListener("hashchange", setActiveMenuLink);
     window.addEventListener("resize", drawChart);
+
+    if (!window.location.hash) window.location.hash = "#entrySection";
+    setActiveMenuLink();
 
     setDefaultDate();
     state.records.forEach((r, i) => r._index = i);
