@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Комуслуги — калькулятор</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --panel-2:#1f2937;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#22c55e;
+      --accent-2:#38bdf8;
+      --danger:#ef4444;
+      --border:#334155;
+      --shadow:0 12px 30px rgba(0,0,0,.25);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg,#020617,#0f172a 40%, #111827 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{
+      width:min(1150px, 100%);
+      margin:0 auto;
+      padding:18px;
+    }
+    .title{
+      margin:0 0 8px;
+      font-size:clamp(28px, 4vw, 40px);
+      line-height:1.05;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin:0 0 20px;
+    }
+    .grid{ display:grid; gap:16px; }
+    .grid-2{ grid-template-columns:1.1fr .9fr; }
+    .grid-3{ grid-template-columns:1fr 1fr 1fr; }
+    @media (max-width:900px){
+      .grid-2,.grid-3{grid-template-columns:1fr}
+    }
+    .card{
+      background:rgba(17,24,39,.95);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .card h2,.card h3{
+      margin:0 0 12px;
+      font-size:20px;
+    }
+    .small{ font-size:13px; color:var(--muted); }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:650px){
+      .row{grid-template-columns:1fr}
+    }
+    label{
+      display:block;
+      font-size:14px;
+      margin-bottom:6px;
+      color:#dbeafe;
+    }
+    input, select, button{
+      width:100%;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#0b1220;
+      color:var(--text);
+      padding:12px 14px;
+      font-size:16px;
+    }
+    input:focus, select:focus{
+      outline:none;
+      border-color:var(--accent-2);
+      box-shadow:0 0 0 3px rgba(56,189,248,.16);
+    }
+    .btns{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+    button{
+      cursor:pointer;
+      font-weight:700;
+      background:#0b1220;
+    }
+    .primary{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#04120a;
+      border:none;
+    }
+    .secondary{
+      background:linear-gradient(180deg,#38bdf8,#0284c7);
+      color:#041019;
+      border:none;
+    }
+    .danger{
+      background:linear-gradient(180deg,#ef4444,#dc2626);
+      color:#fff;
+      border:none;
+    }
+    .services{
+      display:grid;
+      gap:12px;
+    }
+    .service{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      background:rgba(15,23,42,.7);
+    }
+    .service h4{
+      margin:0 0 10px;
+      font-size:17px;
+    }
+    .tariff-line{
+      display:grid;
+      grid-template-columns: 1.4fr .8fr auto;
+      gap:10px;
+      margin-bottom:10px;
+      align-items:end;
+    }
+    @media (max-width:650px){
+      .tariff-line{grid-template-columns:1fr}
+    }
+    .pill{
+      display:inline-block;
+      font-size:12px;
+      border:1px solid var(--border);
+      padding:4px 10px;
+      border-radius:999px;
+      color:#bfdbfe;
+      background:#0b1220;
+      margin-bottom:10px;
+    }
+    .totals{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width:650px){
+      .totals{grid-template-columns:1fr}
+    }
+    .total-box{
+      background:linear-gradient(180deg,rgba(30,41,59,.95), rgba(15,23,42,.95));
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+    }
+    .total-box .n{
+      font-size:30px;
+      font-weight:800;
+      margin-top:6px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+      min-width:900px;
+    }
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+    }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(148,163,184,.18);
+      text-align:left;
+      vertical-align:top;
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      background:#111827;
+      z-index:1;
+    }
+    tr:hover td{
+      background:rgba(51,65,85,.22);
+    }
+    .sum{ font-weight:800; white-space:nowrap; }
+    .right{ text-align:right; white-space:nowrap; }
+    .muted{ color:var(--muted); }
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .divider{
+      height:1px;
+      background:rgba(148,163,184,.15);
+      margin:16px 0;
+    }
+    .badge{
+      font-size:12px;
+      color:#86efac;
+      background:rgba(34,197,94,.08);
+      border:1px solid rgba(34,197,94,.25);
+      border-radius:999px;
+      padding:4px 8px;
+      display:inline-block;
+      margin-left:8px;
+    }
+    .empty{ padding:16px; color:var(--muted); }
+    .prev-box{
+      background:#0b1220;
+      border:1px dashed rgba(148,163,184,.25);
+      border-radius:12px;
+      padding:8px 10px;
+      margin-bottom:10px;
+      color:#cbd5e1;
+      font-size:13px;
+    }
+    .chart-wrap{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:10px;
+      background:rgba(15,23,42,.65);
+    }
+    canvas{
+      width:100%;
+      height:280px;
+      display:block;
+    }
+    .year-summary{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:700px){
+      .year-summary{grid-template-columns:1fr}
+    }
+    .month-list{
+      display:grid;
+      gap:8px;
+    }
+    .month-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border:1px solid rgba(148,163,184,.15);
+      border-radius:12px;
+      background:rgba(11,18,32,.75);
+    }
+    .install-steps{
+      margin:0;
+      padding-left:18px;
+      color:#dbeafe;
+      line-height:1.6;
+    }
+    .install-steps li{ margin-bottom:6px; }
+    .check-line{display:flex;align-items:center;gap:10px;margin-top:8px}
+    .paid-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+    .paid-yes{background:rgba(34,197,94,.14);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+    .paid-no{background:rgba(148,163,184,.12);color:#cbd5e1;border:1px solid rgba(148,163,184,.2)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">Калькулятор коммунальных платежей</h1>
+    <p class="subtitle">Версия 2 с последними правками: расчетный месяц, галка «оплачено», накопление от последней оплаченной записи и первая запись как стартовая база без начисления.</p>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <h2>Новая запись <span class="badge">автосохранение</span></h2>
+        <div class="row">
+          <div>
+            <label for="recordDate">Дата показаний</label>
+            <input id="recordDate" type="date" />
+          </div>
+          <div>
+            <label for="notes">Комментарий</label>
+            <input id="notes" type="text" placeholder="например: хозяйке / для себя" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <div>
+            <label>Расчетный месяц</label>
+            <div class="prev-box" id="billingPeriodBox"></div>
+          </div>
+          <div>
+            <label>Логика месяца</label>
+            <div class="prev-box">Если дата с 01 по 05 число — запись относится к <strong>предыдущему месяцу</strong>.</div>
+          </div>
+        </div>
+
+        <div class="check-line">
+          <input id="paidCheckbox" type="checkbox" />
+          <label for="paidCheckbox" style="margin:0;">Эта запись оплачена / считается опорной для следующих расчетов</label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="services" id="inputsContainer"></div>
+
+        <div class="divider"></div>
+
+        <div class="totals">
+          <div class="total-box">
+            <div class="small">Начисление по счетчикам</div>
+            <div class="n" id="meterTotal">0,00 ₴</div>
+          </div>
+          <div class="total-box">
+            <div class="small">Итого с фиксированными платежами</div>
+            <div class="n" id="grandTotal">0,00 ₴</div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="primary" id="saveBtn">Сохранить запись</button>
+          <button class="secondary" id="calcBtn">Пересчитать</button>
+          <button id="fillTodayBtn">Поставить сегодняшнюю дату</button>
+        </div>
+
+        <p class="hint">
+          Первая запись работает как стартовая точка: вводишь текущие показания, сумма будет 0,00 ₴. Дальше записи считаются от нее или от последней записи с галкой «оплачено».
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Тарифы и услуги</h2>
+        <p class="small">Можно менять тарифы и добавлять новые услуги. Для каждой услуги доступно до 4 тарифных строк.</p>
+
+        <div class="services" id="servicesEditor"></div>
+
+        <div class="btns">
+          <button class="secondary" id="addMeteredBtn">Добавить услугу со счетчиком</button>
+          <button id="addFixedBtn">Добавить фиксированную услугу</button>
+          <button id="resetDefaultsBtn">Вернуть стартовые тарифы</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:16px;">
+      <section class="card">
+        <h2>Сводка по месяцам</h2>
+        <div class="row">
+          <div>
+            <label for="yearFilter">Год</label>
+            <select id="yearFilter"></select>
+          </div>
+          <div>
+            <label>Итог за выбранный год</label>
+            <div class="prev-box" id="yearTotalBox">0,00 ₴</div>
+          </div>
+        </div>
+        <div class="month-list" id="monthSummary"></div>
+      </section>
+
+      <section class="card">
+        <h2>График расходов</h2>
+        <div class="chart-wrap">
+          <canvas id="yearChart" width="700" height="280"></canvas>
+        </div>
+        <p class="hint">Столбики показывают общую сумму по каждому месяцу выбранного года. Учитываются только записи с галкой «оплачено».</p>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>История начислений</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Расчетный месяц</th>
+              <th>Комментарий</th>
+              <th>Статус</th>
+              <th>Детали</th>
+              <th class="right">Сумма</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <div class="btns">
+        <button id="exportBtn">Экспорт JSON</button>
+        <button id="importBtn">Импорт JSON</button>
+        <input id="importFile" type="file" accept="application/json" style="display:none" />
+        <button class="danger" id="clearAllBtn">Очистить всё</button>
+      </div>
+      <p class="hint">Историю можно вести сколько угодно. За 1 год — без проблем, за несколько лет — тоже.</p>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Как сделать почти как приложение на iPhone</h2>
+      <ol class="install-steps">
+        <li>Открой файл или страницу в Safari.</li>
+        <li>Нажми кнопку <strong>Поделиться</strong>.</li>
+        <li>Выбери <strong>На экран «Домой»</strong>.</li>
+        <li>Сохрани ярлык — и калькулятор будет открываться почти как отдельное приложение.</li>
+      </ol>
+      <p class="hint">Для самого удобного варианта лучше открыть этот HTML через сайт или хостинг, например GitHub Pages. Но и просто как страница он уже работает.</p>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "utility_calc_v2_final";
+
+    const defaultState = () => ({
+      services: [
+        { id: uid(), name: "Горячая вода", mode: "metered", unit: "м³", tariffs: [{ name: "Основной", rate: 97.89 }] },
+        { id: uid(), name: "Холодная вода", mode: "metered", unit: "м³", tariffs: [{ name: "Основной", rate: 30.38 }] },
+        { id: uid(), name: "Тепло", mode: "metered", unit: "Гкал", tariffs: [{ name: "Основной", rate: 1654.41 }] },
+        { id: uid(), name: "Свет", mode: "metered", unit: "кВт·ч", tariffs: [{ name: "День", rate: 4.32 }, { name: "Ночь", rate: 2.16 }] },
+        { id: uid(), name: "Газ", mode: "metered", unit: "м³", tariffs: [{ name: "Газ", rate: 7.96 }, { name: "Доставка", rate: 0.384 }] },
+        { id: uid(), name: "ЖЭК", mode: "fixed", unit: "", tariffs: [{ name: "Фиксированный платеж", rate: 1200 }] }
+      ],
+      records: []
+    });
+
+    let state = loadState();
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 10);
+    }
+
+    function normalizeState(data) {
+      if (!data || !Array.isArray(data.services) || !Array.isArray(data.records)) return defaultState();
+      return {
+        services: data.services.map(s => ({
+          id: s.id || uid(),
+          name: s.name || "Новая услуга",
+          mode: s.mode || "metered",
+          unit: s.unit ?? "",
+          tariffs: Array.isArray(s.tariffs) && s.tariffs.length
+            ? s.tariffs.map((t, i) => ({ name: t.name || `Тариф ${i+1}`, rate: Number(t.rate ?? 0) }))
+            : [{ name: "Основной", rate: 0 }]
+        })),
+        records: data.records.map(r => ({
+          ...r,
+          paid: Boolean(r.paid),
+          billingPeriod: r.billingPeriod || getBillingPeriod(r.date)
+        }))
+      };
+    }
+
+    function loadState() {
+      const keys = [STORAGE_KEY, "utility_calc_v3_baseline", "utility_calc_v3_fix", "utility_calc_v3", "utility_calc_v2", "utility_calc_v1"];
+      for (const key of keys) {
+        try {
+          const saved = JSON.parse(localStorage.getItem(key));
+          if (saved && Array.isArray(saved.services) && Array.isArray(saved.records)) return normalizeState(saved);
+        } catch (e) {}
+      }
+      return defaultState();
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function formatMoney(n) {
+      return Number(n || 0).toLocaleString("uk-UA", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₴";
+    }
+
+    function formatNum(n) {
+      return Number(n || 0).toLocaleString("uk-UA", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replaceAll("'", "&#39;");
+    }
+
+    function toNum(v) {
+      return Number(String(v || "").replace(",", ".")) || 0;
+    }
+
+    function setDefaultDate() {
+      const el = document.getElementById("recordDate");
+      if (!el.value) {
+        const d = new Date();
+        el.value = ymd(d);
+      }
+      const period = getBillingPeriod(el.value);
+      document.getElementById("billingPeriodBox").textContent = period ? billingLabel(period) : "—";
+    }
+
+    function ymd(d) {
+      const pad = v => String(v).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    }
+
+    function getBillingPeriod(dateStr) {
+      if (!dateStr) return "";
+      const [y, m, d] = String(dateStr).split("-").map(Number);
+      let year = y, month = m;
+      if (d >= 1 && d <= 5) {
+        month -= 1;
+        if (month < 1) { month = 12; year -= 1; }
+      }
+      return `${year}-${String(month).padStart(2, "0")}`;
+    }
+
+    function billingLabel(period) {
+      if (!period) return "";
+      const months = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+      const [y, m] = String(period).split("-").map(Number);
+      return `${months[m-1]} ${y}`;
+    }
+
+    function sortedRecords() {
+      return [...state.records].sort((a,b) => a.date.localeCompare(b.date));
+    }
+
+    function findLastPaidRecordBefore(dateStr) {
+      const rows = sortedRecords().filter(r => r.date < dateStr && r.paid);
+      return rows[rows.length - 1] || null;
+    }
+
+    function getBaseEntryForService(serviceId, dateStr) {
+      const anchor = findLastPaidRecordBefore(dateStr);
+      if (!anchor) return null;
+      return anchor.entries.find(e => e.serviceId === serviceId) || null;
+    }
+
+    function recomputeAllRecords() {
+      state.records.sort((a,b) => a.date.localeCompare(b.date));
+      const paidAnchors = new Map();
+
+      for (const record of state.records) {
+        record.billingPeriod = getBillingPeriod(record.date);
+        let meterTotal = 0;
+        let grandTotal = 0;
+
+        for (const entry of record.entries) {
+          const service = state.services.find(s => s.id === entry.serviceId);
+          if (!service) continue;
+
+          if (entry.mode === "metered") {
+            const baseEntry = paidAnchors.get(entry.serviceId);
+            entry.currentReadings = entry.currentReadings.map((r, idx) => {
+              let prevValue = baseEntry?.currentReadings?.[idx]?.value ?? 0;
+              if ((record._isFirstRecord ?? false) || (!baseEntry && record._index === 0)) prevValue = Number(r.value || 0);
+              const value = Number(r.value || 0);
+              const used = Math.max(0, value - prevValue);
+              const rate = Number(service.tariffs[idx]?.rate ?? r.rate ?? 0);
+              const amount = used * rate;
+              return {
+                name: service.tariffs[idx]?.name || r.name,
+                value,
+                previousValue: prevValue,
+                used,
+                rate,
+                amount
+              };
+            });
+            entry.total = entry.currentReadings.reduce((s,x) => s + x.amount, 0);
+            meterTotal += entry.total;
+            grandTotal += entry.total;
+
+            if (record.paid) {
+              paidAnchors.set(entry.serviceId, JSON.parse(JSON.stringify(entry)));
+            }
+          } else {
+            let amount = Number(entry.amount ?? service.tariffs[0]?.rate ?? 0);
+            if (record._index === 0) amount = 0;
+            entry.amount = amount;
+            entry.total = amount;
+            grandTotal += amount;
+          }
+        }
+
+        record.meterTotal = meterTotal;
+        record.grandTotal = grandTotal;
+      }
+
+      state.records.forEach((r, i) => { delete r._isFirstRecord; delete r._index; });
+    }
+
+    function getPreviousRecord() {
+      const rows = sortedRecords();
+      return rows[rows.length - 1] || null;
+    }
+
+    function render() {
+      renderInputs();
+      renderServicesEditor();
+      renderHistory();
+      renderYearFilter();
+      renderMonthSummary();
+      drawChart();
+      updatePreview();
+      saveState();
+    }
+
+    function renderInputs() {
+      const wrap = document.getElementById("inputsContainer");
+      wrap.innerHTML = "";
+      const date = document.getElementById("recordDate").value || ymd(new Date());
+      const isFirstRecord = state.records.length === 0;
+
+      state.services.forEach(service => {
+        const div = document.createElement("div");
+        div.className = "service";
+
+        div.innerHTML = `
+          <h4>${escapeHtml(service.name)}</h4>
+          <div class="pill">${service.mode === "metered" ? "По счетчику" : "Фиксированный платеж"}</div>
+          <div class="row" id="inputs-${service.id}"></div>
+        `;
+        wrap.appendChild(div);
+
+        const row = div.querySelector(`#inputs-${CSS.escape(service.id)}`);
+
+        if (service.mode === "metered") {
+          const baseEntry = getBaseEntryForService(service.id, date);
+          service.tariffs.forEach((tariff, idx) => {
+            const prevValue = isFirstRecord ? 0 : (baseEntry?.currentReadings?.[idx]?.value ?? 0);
+            const field = document.createElement("div");
+            field.innerHTML = `
+              <label>${escapeHtml(tariff.name)} — текущее показание</label>
+              <div class="prev-box">База для расчета: <strong>${formatNum(prevValue)}</strong> ${escapeHtml(service.unit || "")} ${isFirstRecord ? "(первая запись будет стартовой, без начисления)" : (baseEntry ? "(из последней оплаченной записи)" : "(старт от нуля)")}</div>
+              <input type="number" step="0.001" inputmode="decimal" data-input-reading="${service.id}:${idx}" placeholder="Введите текущее значение" />
+              <div class="small">Тариф: ${formatMoney(tariff.rate)} / ${escapeHtml(service.unit || "ед.")}</div>
+            `;
+            row.appendChild(field);
+          });
+        } else {
+          const field = document.createElement("div");
+          field.innerHTML = `
+            <label>Сумма за текущий период</label>
+            <div class="prev-box">${isFirstRecord ? "Первая запись будет стартовой, без начисления" : `По умолчанию: <strong>${formatMoney(service.tariffs[0].rate)}</strong>`}</div>
+            <input type="number" step="0.01" inputmode="decimal" data-input-fixed="${service.id}" placeholder="Можно оставить пустым" />
+            <div class="small">Если оставить пустым — возьмется тариф по умолчанию.</div>
+          `;
+          row.appendChild(field);
+        }
+      });
+
+      wrap.querySelectorAll("input").forEach(inp => inp.addEventListener("input", updatePreview));
+    }
+
+    function renderServicesEditor() {
+      const wrap = document.getElementById("servicesEditor");
+      wrap.innerHTML = "";
+
+      state.services.forEach(service => {
+        const block = document.createElement("div");
+        block.className = "service";
+        block.innerHTML = `
+          <div class="row">
+            <div>
+              <label>Название услуги</label>
+              <input type="text" value="${escapeAttr(service.name)}" data-service-name="${service.id}" />
+            </div>
+            <div>
+              <label>Тип</label>
+              <select data-service-mode="${service.id}">
+                <option value="metered" ${service.mode === "metered" ? "selected" : ""}>По счетчику</option>
+                <option value="fixed" ${service.mode === "fixed" ? "selected" : ""}>Фиксированный платеж</option>
+              </select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div>
+              <label>Единица измерения</label>
+              <input type="text" value="${escapeAttr(service.unit || "")}" data-service-unit="${service.id}" placeholder="м³, кВт·ч, Гкал..." />
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div id="tariffs-${service.id}"></div>
+          <div class="btns">
+            ${service.tariffs.length < 4 ? `<button data-add-tariff="${service.id}">Добавить тариф</button>` : ""}
+            <button class="danger" data-delete-service="${service.id}">Удалить услугу</button>
+          </div>
+        `;
+        wrap.appendChild(block);
+
+        const tWrap = block.querySelector(`#tariffs-${CSS.escape(service.id)}`);
+        service.tariffs.forEach((tariff, idx) => {
+          const row = document.createElement("div");
+          row.className = "tariff-line";
+          row.innerHTML = `
+            <div>
+              <label>Название тарифа</label>
+              <input type="text" value="${escapeAttr(tariff.name || "")}" data-tariff-name="${service.id}:${idx}" />
+            </div>
+            <div>
+              <label>Тариф</label>
+              <input type="number" step="0.001" value="${tariff.rate}" data-tariff-rate="${service.id}:${idx}" />
+            </div>
+            <div>
+              ${service.tariffs.length > 1 ? `<button class="danger" data-delete-tariff="${service.id}:${idx}">✕</button>` : ""}
+            </div>
+          `;
+          tWrap.appendChild(row);
+        });
+      });
+
+      bindEditorEvents();
+    }
+
+    function bindEditorEvents() {
+      document.querySelectorAll("[data-service-name]").forEach(el => {
+        el.addEventListener("input", e => {
+          const s = state.services.find(x => x.id === e.target.dataset.serviceName);
+          if (!s) return;
+          s.name = e.target.value;
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-service-mode]").forEach(el => {
+        el.addEventListener("change", e => {
+          const s = state.services.find(x => x.id === e.target.dataset.serviceMode);
+          if (!s) return;
+          s.mode = e.target.value;
+          if (s.mode === "fixed" && s.tariffs.length > 1) s.tariffs = [s.tariffs[0]];
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-service-unit]").forEach(el => {
+        el.addEventListener("input", e => {
+          const s = state.services.find(x => x.id === e.target.dataset.serviceUnit);
+          if (!s) return;
+          s.unit = e.target.value;
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-tariff-name]").forEach(el => {
+        el.addEventListener("input", e => {
+          const [sid, idx] = e.target.dataset.tariffName.split(":");
+          const s = state.services.find(x => x.id === sid);
+          if (!s) return;
+          s.tariffs[Number(idx)].name = e.target.value;
+          saveState();
+          renderMonthSummary();
+          drawChart();
+        });
+      });
+
+      document.querySelectorAll("[data-tariff-rate]").forEach(el => {
+        el.addEventListener("input", e => {
+          const [sid, idx] = e.target.dataset.tariffRate.split(":");
+          const s = state.services.find(x => x.id === sid);
+          if (!s) return;
+          s.tariffs[Number(idx)].rate = toNum(e.target.value);
+          updatePreview();
+          saveState();
+        });
+      });
+
+      document.querySelectorAll("[data-add-tariff]").forEach(el => {
+        el.addEventListener("click", e => {
+          const s = state.services.find(x => x.id === e.target.dataset.addTariff);
+          if (!s || s.tariffs.length >= 4) return;
+          s.tariffs.push({ name: `Тариф ${s.tariffs.length + 1}`, rate: 0 });
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-delete-service]").forEach(el => {
+        el.addEventListener("click", e => {
+          const id = e.target.dataset.deleteService;
+          if (!confirm("Удалить услугу?")) return;
+          state.services = state.services.filter(x => x.id !== id);
+          state.records = state.records.map(r => ({ ...r, entries: r.entries.filter(en => en.serviceId !== id) }));
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-delete-tariff]").forEach(el => {
+        el.addEventListener("click", e => {
+          const [sid, idx] = e.target.dataset.deleteTariff.split(":");
+          const s = state.services.find(x => x.id === sid);
+          if (!s || s.tariffs.length <= 1) return;
+          s.tariffs.splice(Number(idx), 1);
+          render();
+        });
+      });
+    }
+
+    function collectDraft(validate = true) {
+      const date = document.getElementById("recordDate").value;
+      const notes = document.getElementById("notes").value.trim();
+      const paid = document.getElementById("paidCheckbox").checked;
+      const billingPeriod = getBillingPeriod(date);
+      if (validate && !date) {
+        alert("Укажи дату.");
+        return null;
+      }
+
+      const entries = [];
+      let meterTotal = 0;
+      let grandTotal = 0;
+      const isFirstRecord = state.records.length === 0;
+
+      for (const service of state.services) {
+        if (service.mode === "metered") {
+          const currentReadings = [];
+          const baseEntry = getBaseEntryForService(service.id, date);
+
+          for (let i = 0; i < service.tariffs.length; i++) {
+            const input = document.querySelector(`[data-input-reading="${service.id}:${i}"]`);
+            const valRaw = input?.value ?? "";
+            const current = toNum(valRaw);
+
+            if (validate && valRaw === "") {
+              alert(`Заполни показание для "${service.name}" → "${service.tariffs[i].name}".`);
+              return null;
+            }
+
+            let prevValue = baseEntry?.currentReadings?.[i]?.value ?? 0;
+            if (isFirstRecord) prevValue = current;
+
+            const used = current - prevValue;
+            if (validate && used < 0) {
+              alert(`По услуге "${service.name}" новое показание меньше базы расчета.`);
+              return null;
+            }
+
+            const rate = toNum(service.tariffs[i].rate);
+            const amount = Math.max(0, used) * rate;
+            currentReadings.push({
+              name: service.tariffs[i].name,
+              value: current,
+              previousValue: prevValue,
+              used: Math.max(0, used),
+              rate,
+              amount
+            });
+          }
+
+          const total = currentReadings.reduce((s, x) => s + x.amount, 0);
+          meterTotal += total;
+          grandTotal += total;
+          entries.push({ serviceId: service.id, serviceName: service.name, mode: service.mode, currentReadings, total });
+        } else {
+          const input = document.querySelector(`[data-input-fixed="${service.id}"]`);
+          let amount = input && input.value !== "" ? toNum(input.value) : toNum(service.tariffs[0].rate);
+          if (isFirstRecord) amount = 0;
+          grandTotal += amount;
+          entries.push({ serviceId: service.id, serviceName: service.name, mode: service.mode, amount, total: amount });
+        }
+      }
+
+      return { date, billingPeriod, notes, paid, entries, meterTotal, grandTotal };
+    }
+
+    function updatePreview() {
+      const date = document.getElementById("recordDate").value;
+      document.getElementById("billingPeriodBox").textContent = date ? billingLabel(getBillingPeriod(date)) : "—";
+      const draft = collectDraft(false);
+      document.getElementById("meterTotal").textContent = formatMoney(draft?.meterTotal || 0);
+      document.getElementById("grandTotal").textContent = formatMoney(draft?.grandTotal || 0);
+    }
+
+    function renderHistory() {
+      const body = document.getElementById("historyBody");
+      body.innerHTML = "";
+      const rows = sortedRecords();
+
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty">История пока пустая. Добавь стартовую запись, например от 2026-03-26.</td></tr>`;
+        return;
+      }
+
+      rows.forEach((record, idx) => {
+        const tr = document.createElement("tr");
+
+        const details = record.entries.map(entry => {
+          if (entry.mode === "metered") {
+            const inner = entry.currentReadings.map(r =>
+              `${escapeHtml(r.name)}: ${formatNum(r.previousValue)} → ${formatNum(r.value)} (${formatNum(r.used)}) × ${formatMoney(r.rate).replace(" ₴","")} = ${formatMoney(r.amount)}`
+            ).join("<br>");
+            return `<div><strong>${escapeHtml(entry.serviceName)}</strong><br>${inner}</div>`;
+          }
+          return `<div><strong>${escapeHtml(entry.serviceName)}</strong>: ${formatMoney(entry.amount)}</div>`;
+        }).join("<div style='height:8px'></div>");
+
+        tr.innerHTML = `
+          <td>${escapeHtml(record.date)}</td>
+          <td>${escapeHtml(billingLabel(record.billingPeriod || getBillingPeriod(record.date)))}</td>
+          <td>${escapeHtml(record.notes || "")}</td>
+          <td>
+            <div class="check-line" style="margin:0;">
+              <input type="checkbox" data-paid-toggle="${idx}" ${record.paid ? "checked" : ""} />
+              <span class="paid-tag ${record.paid ? "paid-yes" : "paid-no"}">${record.paid ? "Оплачено" : "Не оплачено"}</span>
+            </div>
+          </td>
+          <td>${details}</td>
+          <td class="right sum">${formatMoney(record.grandTotal)}</td>
+          <td><button class="danger" data-del-record="${idx}">Удалить</button></td>
+        `;
+        body.appendChild(tr);
+      });
+
+      body.querySelectorAll("[data-paid-toggle]").forEach(el => {
+        el.addEventListener("change", e => {
+          const idx = Number(e.target.dataset.paidToggle);
+          const rows = sortedRecords();
+          const target = rows[idx];
+          if (!target) return;
+          const actual = state.records.find(r => r.date === target.date && r.notes === target.notes && r.grandTotal === target.grandTotal);
+          if (actual) actual.paid = e.target.checked;
+          state.records.forEach((r, i) => r._index = i);
+          recomputeAllRecords();
+          render();
+        });
+      });
+
+      body.querySelectorAll("[data-del-record]").forEach(btn => {
+        btn.addEventListener("click", e => {
+          const idx = Number(e.target.dataset.delRecord);
+          const rows = sortedRecords();
+          const target = rows[idx];
+          if (!target) return;
+          if (!confirm(`Удалить запись от ${target.date}?`)) return;
+          const actualIndex = state.records.findIndex(r => r.date === target.date && r.notes === target.notes && r.grandTotal === target.grandTotal);
+          if (actualIndex >= 0) state.records.splice(actualIndex, 1);
+          state.records.forEach((r, i) => r._index = i);
+          recomputeAllRecords();
+          render();
+        });
+      });
+    }
+
+    function getAvailableYears() {
+      const years = [...new Set(state.records.filter(r => r.paid).map(r => Number(String((r.billingPeriod || getBillingPeriod(r.date))).slice(0,4))))].filter(Boolean).sort((a,b) => a-b);
+      if (!years.length) years.push(new Date().getFullYear());
+      return years;
+    }
+
+    function renderYearFilter() {
+      const sel = document.getElementById("yearFilter");
+      const current = Number(sel.value) || getAvailableYears()[getAvailableYears().length - 1];
+      const years = getAvailableYears();
+      sel.innerHTML = years.map(y => `<option value="${y}" ${y === current ? "selected" : ""}>${y}</option>`).join("");
+      if (!sel.dataset.bound) {
+        sel.addEventListener("change", () => {
+          renderMonthSummary();
+          drawChart();
+        });
+        sel.dataset.bound = "1";
+      }
+    }
+
+    function monthAggForYear(year) {
+      const arr = Array.from({length:12}, (_,i) => ({ month:i+1, total:0 }));
+      state.records.forEach(r => {
+        if (!r.paid) return;
+        const period = r.billingPeriod || getBillingPeriod(r.date);
+        const y = Number(String(period).slice(0,4));
+        const m = Number(String(period).slice(5,7));
+        if (y === Number(year) && m >= 1 && m <= 12) arr[m-1].total += Number(r.grandTotal || 0);
+      });
+      return arr;
+    }
+
+    function renderMonthSummary() {
+      const year = Number(document.getElementById("yearFilter").value || new Date().getFullYear());
+      const wrap = document.getElementById("monthSummary");
+      const yearBox = document.getElementById("yearTotalBox");
+      const months = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+      const data = monthAggForYear(year);
+      const total = data.reduce((s,x) => s + x.total, 0);
+      yearBox.textContent = formatMoney(total);
+
+      wrap.innerHTML = data.map((m, i) => `
+        <div class="month-item">
+          <span>${months[i]} ${year}</span>
+          <strong>${formatMoney(m.total)}</strong>
+        </div>
+      `).join("");
+    }
+
+    function drawChart() {
+      const canvas = document.getElementById("yearChart");
+      const ctx = canvas.getContext("2d");
+      const year = Number(document.getElementById("yearFilter").value || new Date().getFullYear());
+      const data = monthAggForYear(year).map(x => x.total);
+      const labels = ["Я","Ф","М","А","М","И","И","А","С","О","Н","Д"];
+
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(280 * dpr);
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = 280;
+      ctx.clearRect(0,0,w,h);
+
+      ctx.fillStyle = "#0b1220";
+      ctx.fillRect(0,0,w,h);
+
+      const left = 36;
+      const right = 10;
+      const top = 14;
+      const bottom = 28;
+      const chartW = w - left - right;
+      const chartH = h - top - bottom;
+      const maxVal = Math.max(...data, 1);
+
+      ctx.strokeStyle = "rgba(148,163,184,.18)";
+      ctx.lineWidth = 1;
+      for (let i=0;i<=4;i++) {
+        const y = top + chartH * i / 4;
+        ctx.beginPath();
+        ctx.moveTo(left, y);
+        ctx.lineTo(left + chartW, y);
+        ctx.stroke();
+      }
+
+      const barGap = 10;
+      const barW = (chartW - barGap * 11) / 12;
+
+      data.forEach((v, i) => {
+        const x = left + i * (barW + barGap);
+        const bh = maxVal ? (v / maxVal) * (chartH - 6) : 0;
+        const y = top + chartH - bh;
+
+        ctx.fillStyle = "rgba(56,189,248,.85)";
+        roundRect(ctx, x, y, barW, bh, 8, true);
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "12px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText(labels[i], x + barW/2, h - 10);
+      });
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "12px system-ui";
+      ctx.textAlign = "left";
+      ctx.fillText(year + " год", left, 12);
+
+      if (data.every(v => v === 0)) {
+        ctx.fillStyle = "#64748b";
+        ctx.textAlign = "center";
+        ctx.fillText("Пока нет данных за выбранный год", w/2, h/2);
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill) {
+      if (h < 0) h = 0;
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+      if (fill) ctx.fill();
+    }
+
+    function clearEntryForm() {
+      document.getElementById("notes").value = "";
+      document.getElementById("paidCheckbox").checked = false;
+      document.querySelectorAll("[data-input-reading], [data-input-fixed]").forEach(el => el.value = "");
+      document.getElementById("recordDate").value = ymd(new Date());
+      updatePreview();
+      renderInputs();
+    }
+
+    document.getElementById("recordDate").addEventListener("change", () => {
+      updatePreview();
+      renderInputs();
+    });
+
+    document.getElementById("calcBtn").addEventListener("click", updatePreview);
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const draft = collectDraft(true);
+      if (!draft) return;
+
+      const exists = state.records.some(r => r.date === draft.date);
+      if (exists && !confirm("Запись на эту дату уже есть. Добавить ещё одну?")) return;
+
+      state.records.push(draft);
+      state.records.sort((a,b) => a.date.localeCompare(b.date));
+      state.records.forEach((r, i) => r._index = i);
+      recomputeAllRecords();
+      clearEntryForm();
+      render();
+    });
+
+    document.getElementById("fillTodayBtn").addEventListener("click", () => {
+      document.getElementById("recordDate").value = ymd(new Date());
+      updatePreview();
+      renderInputs();
+    });
+
+    document.getElementById("addMeteredBtn").addEventListener("click", () => {
+      state.services.push({ id: uid(), name: "Новая услуга", mode: "metered", unit: "", tariffs: [{ name: "Основной", rate: 0 }] });
+      render();
+    });
+
+    document.getElementById("addFixedBtn").addEventListener("click", () => {
+      state.services.push({ id: uid(), name: "Новая фиксированная услуга", mode: "fixed", unit: "", tariffs: [{ name: "Фиксированный платеж", rate: 0 }] });
+      render();
+    });
+
+    document.getElementById("resetDefaultsBtn").addEventListener("click", () => {
+      if (!confirm("Сбросить тарифы к стартовым? История начислений останется.")) return;
+      const records = state.records;
+      state = defaultState();
+      state.records = records;
+      state.records.forEach((r, i) => r._index = i);
+      recomputeAllRecords();
+      render();
+    });
+
+    document.getElementById("clearAllBtn").addEventListener("click", () => {
+      if (!confirm("Удалить все данные и историю?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = defaultState();
+      render();
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "komuslugi-backup.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById("importBtn").addEventListener("click", () => {
+      document.getElementById("importFile").click();
+    });
+
+    document.getElementById("importFile").addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data.services) || !Array.isArray(data.records)) throw new Error("bad format");
+        state = normalizeState(data);
+        state.records.forEach((r, i) => r._index = i);
+        recomputeAllRecords();
+        render();
+        alert("Импорт выполнен.");
+      } catch {
+        alert("Не удалось импортировать файл.");
+      }
+      e.target.value = "";
+    });
+
+    window.addEventListener("resize", drawChart);
+
+    setDefaultDate();
+    state.records.forEach((r, i) => r._index = i);
+    recomputeAllRecords();
+    render();
+  </script>
+</body>
+</html>
